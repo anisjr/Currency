@@ -10,6 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import android.widget.ArrayAdapter;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -53,12 +57,37 @@ public class MainActivity extends ActionBarActivity {
      */
     public static class PlaceholderFragment extends Fragment {
 
+        ArrayAdapter<String> mHistoryAdapter;
+
         public PlaceholderFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
+            // Create some dummy data for the ListView.  Here's a sample history
+            String[] data = {
+                    " 2014 - EUR-TND - 2.2",
+                    " 2013 - EUR-TND - 2.1",
+                    " 2012 - EUR-TND - 2.0",
+                    " 2011 - EUR-TND - 1.9",
+                    " 2010 - EUR-TND - 1.8",
+                    " 2009 - EUR-TND - 1.7",
+                    " 2008 - EUR-TND - 1.6"
+            };
+            List<String> yearHistory = new ArrayList<String>(Arrays.asList(data));
+
+            // The ArrayAdapter will take data from a source (like our dummy history)
+            //and use it to populate the ListView it's attached to.
+            mHistoryAdapter =
+                    new ArrayAdapter<String>(
+                            getActivity(), // The current context (this activity)
+                            R.layout.list_item_history, // The name of the layout ID.
+                            R.id.list_item_history_textview, // The ID of the textview to populate.
+                            yearHistory);
+
+
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
