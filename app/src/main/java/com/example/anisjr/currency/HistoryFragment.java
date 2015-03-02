@@ -246,5 +246,16 @@ public class HistoryFragment extends Fragment {
                                // This will only happen if there was an error getting or parsing the history.
             return null;
         }
+
+        @Override
+               protected void onPostExecute(String[] result) {
+                        if (result != null) {
+                                mHistoryAdapter.clear();
+                                for(String dayHistoryStr : result) {
+                                        mHistoryAdapter.add(dayHistoryStr);
+                                    }
+                                // New data is back from the server.  Hooray!
+                                    }
+                    }
     }
 }
