@@ -29,6 +29,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.text.SimpleDateFormat;
+import android.widget.AdapterView;
+import android.content.Intent;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
@@ -99,7 +101,16 @@ public class HistoryFragment extends Fragment {
         ListView listView = (ListView) rootView.findViewById(R.id.listview_history);
         listView.setAdapter(mHistoryAdapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                              String forecast = mHistoryAdapter.getItem(position);
+                              Intent intent = new Intent(getActivity(), DetailActivity.class)
+                                                   .putExtra(Intent.EXTRA_TEXT, forecast);
+                                startActivity(intent);
+                           }
+                   });
 
 
         return rootView;
