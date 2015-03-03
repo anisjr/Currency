@@ -66,10 +66,8 @@ public class HistoryFragment extends Fragment {
         if (id == R.id.action_refresh) {
             FetchCurrencyTask currencyTask = new FetchCurrencyTask();
             //currencyTask.execute("USD");
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                        String location = prefs.getString(getString(R.string.pref_currencyFrom_key),
-                              getString(R.string.pref_currencyFrom_default));
-                      currencyTask.execute(location);
+
+            updateCurrency();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -79,27 +77,14 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Create some dummy data for the ListView.  Here's a sample history
-        String[] data = {
-                "Mon 6/23 - EUR-TND - 2.2",
-                "Tue 6/24 - EUR-TND - 2.1",
-                "Wed 6/25 - EUR-TND - 2.0",
-                "Thurs 6/26 - EUR-TND - 1.9",
-                "Fri 6/27 - EUR-TND - 1.8",
-                "Sat 6/28 - EUR-TND - 1.7",
-                "Sun 6/29 - EUR-TND - 1.6"
-
-        };
-        List<String> weekHistory = new ArrayList<String>(Arrays.asList(data));
-
-        // The ArrayAdapter will take data from a source (like our dummy history)
-        //and use it to populate the ListView it's attached to.
+        // The ArrayAdapter will take data from a source and
+        // use it to populate the ListView it's attached to.
         mHistoryAdapter =
                 new ArrayAdapter<String>(
                         getActivity(), // The current context (this activity)
                         R.layout.list_item_history, // The name of the layout ID.
                         R.id.list_item_history_textview, // The ID of the textview to populate.
-                        weekHistory);
+                        new ArrayList<String>());
 
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -122,6 +107,22 @@ public class HistoryFragment extends Fragment {
 
         return rootView;
     }
+
+    private void updateCurrency() {
+        FetchCurrencyTask currencyTask = new FetchCurrencyTask();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String currencyFrom = prefs.getString(getString(R.string.pref_currencyFrom_key),
+                getString(R.string.pref_currencyFrom_default));
+        currencyTask.execute(currencyFrom);
+    }
+
+    @Override
+        public void onStart() {
+                super.onStart();
+                updateCurrency();
+            }
+
 
     public class FetchCurrencyTask extends AsyncTask<String, Void, String[]> {
 
