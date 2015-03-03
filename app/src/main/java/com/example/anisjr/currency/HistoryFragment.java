@@ -137,14 +137,11 @@ public class HistoryFragment extends Fragment {
         private String[] getCurrencyDataFromJson(String historyJsonStr, int numDays)
                 throws JSONException {
 
-            // These are the names of the JSON objects that need to be extracted.
-            final String OWM_RATES = "rates";
-            final String OWM_utctime = "utctime";
-            final String OWM_rate = "rate";
-
 
             JSONObject historyJson = new JSONObject(historyJsonStr);
             JSONObject daysHistory = historyJson.getJSONObject("rates");
+            String fromCurrency = (String) historyJson.get("from");
+
 
                  int i=0;
             String[] resultStrs = new String[numDays];
@@ -161,7 +158,7 @@ public class HistoryFragment extends Fragment {
               date = new SimpleDateFormat("yyyy-MM-dd").format(daysBeforeDate);
                JSONObject values = daysHistory.getJSONObject(date);
               Double histrate = values.getDouble("rate");
-               resultStrs[i] =  date + " - " + histrate;
+               resultStrs[i] =  date + " _ " + fromCurrency + "-TND _ " + histrate;
                i++;
             }
            // while (keys.hasNext()) {
