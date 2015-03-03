@@ -18,6 +18,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import android.view.Menu;
@@ -33,7 +35,7 @@ import android.widget.AdapterView;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-
+import java.util.Calendar;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
@@ -185,6 +187,13 @@ public class HistoryFragment extends Fragment {
 
             String toCurrency = "TND";
             int numDays = 7;
+            String dateEnd = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_YEAR, -6);
+            Date daysBeforeDate = cal.getTime();
+            String dateStart = new SimpleDateFormat("yyyy-MM-dd").format(daysBeforeDate);
 
             try {
                 // Construct the URL for the  query
@@ -200,8 +209,9 @@ public class HistoryFragment extends Fragment {
                                         Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                                                .appendQueryParameter(fromCurrency_PARAM, params[0])
                                                 .appendQueryParameter(toCurrency_PARAM,toCurrency)
-                                                .appendQueryParameter(dateStart_PARAM, "2014-06-17")
-                                               .appendQueryParameter(dateEnd_PARAM,"2014-06-23" )
+                                             //   .appendQueryParameter(dateStart_PARAM, "2015-02-26")
+                                             .appendQueryParameter(dateStart_PARAM,dateStart)
+                                               .appendQueryParameter(dateEnd_PARAM,dateEnd )
                                                 .build();
 
                                       URL url = new URL(builtUri.toString());
