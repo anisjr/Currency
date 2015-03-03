@@ -31,6 +31,9 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import android.widget.AdapterView;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
@@ -62,7 +65,11 @@ public class HistoryFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             FetchCurrencyTask currencyTask = new FetchCurrencyTask();
-            currencyTask.execute("USD");
+            //currencyTask.execute("USD");
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        String location = prefs.getString(getString(R.string.pref_currencyFrom_key),
+                              getString(R.string.pref_currencyFrom_default));
+                      currencyTask.execute(location);
             return true;
         }
         return super.onOptionsItemSelected(item);
