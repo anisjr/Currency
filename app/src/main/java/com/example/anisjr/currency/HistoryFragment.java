@@ -152,15 +152,28 @@ public class HistoryFragment extends Fragment {
             Iterator<String> keys = daysHistory.keys();
             String date;
 
+            Calendar cal = GregorianCalendar.getInstance();
 
-             while (keys.hasNext()) {
-                date = (String) keys.next();
-                JSONObject values = daysHistory.getJSONObject(date);
-                Double histrate = values.getDouble("rate");
-                resultStrs[i] =  date + " - " + histrate;
-                i++;
-
+           while (i<numDays) {
+               cal.setTime(new Date());
+               cal.add(Calendar.DAY_OF_YEAR, -i);
+               Date daysBeforeDate = cal.getTime();
+              date = new SimpleDateFormat("yyyy-MM-dd").format(daysBeforeDate);
+               JSONObject values = daysHistory.getJSONObject(date);
+              Double histrate = values.getDouble("rate");
+               resultStrs[i] =  date + " - " + histrate;
+               i++;
             }
+           // while (keys.hasNext()) {
+              //  date = (String) keys.next();
+               // JSONObject values = daysHistory.getJSONObject(date);
+               // Double histrate = values.getDouble("rate");
+               // resultStrs[i] =  date + " - " + histrate;
+               // i++;
+            //}
+
+
+
 
             for (String s : resultStrs) {
                 Log.v(LOG_TAG, "History entry: " + s);
