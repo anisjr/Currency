@@ -35,7 +35,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.anisjr.currency.MainActivity" />
         </activity>
-
+        <provider
+            android:authorities="com.example.anisjr.currency"
+            android:name=".data.CurrencyProvider" />
     </application>
 
 </manifest>
