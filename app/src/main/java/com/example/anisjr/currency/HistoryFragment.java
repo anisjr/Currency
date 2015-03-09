@@ -66,10 +66,9 @@ public class HistoryFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchCurrencyTask currencyTask = new FetchCurrencyTask();
+            //FetchCurrencyTask currencyTask = new FetchCurrencyTask();
             //currencyTask.execute("USD");
-
-            updateCurrency();
+                updateCurrency();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -111,7 +110,7 @@ public class HistoryFragment extends Fragment {
     }
 
     private void updateCurrency() {
-        FetchCurrencyTask currencyTask = new FetchCurrencyTask();
+        FetchCurrencyTask currencyTask = new FetchCurrencyTask(getActivity(),mHistoryAdapter );
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String currencyFrom = prefs.getString(getString(R.string.pref_currencyFrom_key),
