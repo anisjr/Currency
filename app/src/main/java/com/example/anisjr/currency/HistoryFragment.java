@@ -36,13 +36,46 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import java.util.Calendar;
+import android.database.Cursor;
+import android.net.Uri;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import com.example.anisjr.currency.data.CurrencyContract;
+import com.example.anisjr.currency.data.CurrencyContract.CurrencyEntry;
+import java.util.Date;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements LoaderCallbacks<Cursor>  {
 
     ArrayAdapter<String> mHistoryAdapter;
+
+    private static final int HISTORY_LOADER = 0;
+    private String  mCurrencuFrom;
+
+    // For the HISTORY view we're showing only a small subset of the stored data.
+    // Specify the columns we need.
+    private static final String[] HISTORY_COLUMNS = {
+
+            CurrencyEntry.TABLE_NAME + "." + CurrencyEntry._ID,
+            CurrencyEntry.COLUMN_DATETEXT,
+            CurrencyEntry.COLUMN_RATE,
+            CurrencyEntry.COLUMN_FROM_Currency,
+            CurrencyEntry.COLUMN_TO_Currency
+
+    };
+
+
+    // These indices are tied to HISTORY_COLUMNS.  If HISTORY_COLUMNS changes, these
+    // must change.
+    public static final int COL_CURRENCY_ID = 0;
+    public static final int COL_CURRENCY_DATE = 1;
+    public static final int COL_CURRENCY_RATE = 2;
+    public static final int COL_CURRENCY_FROM_Currency = 3;
+    public static final int COL_CURRENCY_TO_Currency = 4;
+
 
     public HistoryFragment() {
     }
@@ -109,13 +142,17 @@ public class HistoryFragment extends Fragment {
         return rootView;
     }
 
-    private void updateCurrency() {
-        FetchCurrencyTask currencyTask = new FetchCurrencyTask(getActivity(),mHistoryAdapter );
+    @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+                getLoaderManager().initLoader(HISTORY_LOADER, null, this);
+               super.onActivityCreated(savedInstanceState);
+            }
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String currencyFrom = prefs.getString(getString(R.string.pref_currencyFrom_key),
-                getString(R.string.pref_currencyFrom_default));
-        currencyTask.execute(currencyFrom);
+
+    private void updateCurrency() {
+
+        String currencyFrom = Utility.getPreferredCurrencyFrom(getActivity());
+        new FetchCurrencyTask(getActivity(), mHistoryAdapter).execute(currencyFrom);
     }
 
     @Override
@@ -125,5 +162,43 @@ public class HistoryFragment extends Fragment {
             }
 
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // This is called when a new Loader needs to be created.  This
+        // fragment only uses one loader, so we don't care about checking the id.
+
+        // To only show current and future dates, get the String representation for today,
+        // and filter the query to return weather only for dates after or including today.
+        // Only return data after today.
+        String startDate = CurrencyContract.getDbDateString(new Date());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = CurrencyEntry.COLUMN_DATETEXT + " ASC";
+
+        mCurrencuFrom = Utility.getPreferredCurrencyFrom(getActivity());
+        Uri weatherForLocationUri = CurrencyEntry.buildCurrencyFromWithStartDate(
+                mCurrencuFrom, startDate);
+
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        return new CursorLoader(
+                getActivity(),
+                weatherForLocationUri,
+                HISTORY_COLUMNS,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 
 }
