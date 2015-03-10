@@ -44,13 +44,15 @@ import android.support.v4.content.Loader;
 import com.example.anisjr.currency.data.CurrencyContract;
 import com.example.anisjr.currency.data.CurrencyContract.CurrencyEntry;
 import java.util.Date;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
 public class HistoryFragment extends Fragment implements LoaderCallbacks<Cursor>  {
 
-    ArrayAdapter<String> mHistoryAdapter;
+    private SimpleCursorAdapter mHistoryAdapter;
 
     private static final int HISTORY_LOADER = 0;
     private String  mCurrencuFrom;
@@ -111,14 +113,45 @@ public class HistoryFragment extends Fragment implements LoaderCallbacks<Cursor>
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // The ArrayAdapter will take data from a source and
-        // use it to populate the ListView it's attached to.
-        mHistoryAdapter =
-                new ArrayAdapter<String>(
-                        getActivity(), // The current context (this activity)
-                        R.layout.list_item_history, // The name of the layout ID.
-                        R.id.list_item_history_textview, // The ID of the textview to populate.
-                        new ArrayList<String>());
+
+
+        // The SimpleCursorAdapter will take data from the database through the
+        // Loader and use it to populate the ListView it's attached to.
+        mHistoryAdapter = new SimpleCursorAdapter(
+                getActivity(),
+                R.layout.list_item_history,
+                null,
+                // the column names to use to fill the textviews
+                new String[]{CurrencyEntry.COLUMN_DATETEXT,
+                        CurrencyEntry.COLUMN_FROM_Currency,
+                        CurrencyEntry.COLUMN_TO_Currency,
+                        CurrencyEntry.COLUMN_RATE
+                },
+                // the textviews to fill with the data pulled from the columns above
+                new int[]{R.id.list_item_date_textview,
+                        R.id.list_item_currencyFrom_textview,
+                        R.id.list_item_currencyTo_textview,
+                        R.id.list_item_historyRate_textview
+                },
+                0
+        );
+
+        mHistoryAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+
+                switch (columnIndex) {
+
+                    case COL_CURRENCY_DATE: {
+                        String dateString = cursor.getString(columnIndex);
+                        TextView dateView = (TextView) view;
+                        dateView.setText(Utility.formatDate(dateString));
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -131,10 +164,23 @@ public class HistoryFragment extends Fragment implements LoaderCallbacks<Cursor>
 
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                              String forecast = mHistoryAdapter.getItem(position);
-                              Intent intent = new Intent(getActivity(), DetailActivity.class)
-                                                   .putExtra(Intent.EXTRA_TEXT, forecast);
-                                startActivity(intent);
+
+                    Cursor cursor = mHistoryAdapter.getCursor();
+                    if (cursor != null && cursor.moveToPosition(position)) {
+                        String dateString = Utility.formatDate(cursor.getString(COL_CURRENCY_DATE));
+                        String currencyRate = cursor.getString(COL_CURRENCY_RATE);
+
+
+                        String currencyFrom = cursor.getString(COL_CURRENCY_FROM_Currency);
+                        String currencyTo = cursor.getString(COL_CURRENCY_TO_Currency);
+
+                        String detailString = String.format("%s - %s - %s/%s",
+                                dateString, currencyRate,currencyFrom , currencyTo);
+
+                        Intent intent = new Intent(getActivity(), DetailActivity.class)
+                                .putExtra(Intent.EXTRA_TEXT, detailString);
+                        startActivity(intent);
+                    }
                            }
                    });
 
@@ -152,15 +198,17 @@ public class HistoryFragment extends Fragment implements LoaderCallbacks<Cursor>
     private void updateCurrency() {
 
         String currencyFrom = Utility.getPreferredCurrencyFrom(getActivity());
-        new FetchCurrencyTask(getActivity(), mHistoryAdapter).execute(currencyFrom);
+        new FetchCurrencyTask(getActivity()).execute(currencyFrom);
     }
 
-    @Override
-        public void onStart() {
-                super.onStart();
-                updateCurrency();
-            }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mCurrencuFrom != null && !mCurrencuFrom.equals(Utility.getPreferredCurrencyFrom(getActivity()))) {
+            getLoaderManager().restartLoader(HISTORY_LOADER, null, this);
+        }
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -173,7 +221,7 @@ public class HistoryFragment extends Fragment implements LoaderCallbacks<Cursor>
         String startDate = CurrencyContract.getDbDateString(new Date());
 
         // Sort order:  Ascending, by date.
-        String sortOrder = CurrencyEntry.COLUMN_DATETEXT + " ASC";
+        String sortOrder = CurrencyEntry.COLUMN_DATETEXT + " DESC";
 
         mCurrencuFrom = Utility.getPreferredCurrencyFrom(getActivity());
         Uri weatherForLocationUri = CurrencyEntry.buildCurrencyFromWithStartDate(
@@ -193,12 +241,12 @@ public class HistoryFragment extends Fragment implements LoaderCallbacks<Cursor>
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        mHistoryAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mHistoryAdapter.swapCursor(null);
     }
 
 }
