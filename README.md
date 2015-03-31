@@ -7,3 +7,4 @@ He/she wants a way to get currency rates history.
 Proposed Solution:
 Design an app that allows a user to indicate a  foreign currency that they would like to follow and compare to local currency.
 
+https://drive.google.com/file/d/0B5ZfGTUKhOJvUkVWcG9yYklFNk0/view?usp=sharing
