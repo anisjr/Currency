@@ -73,7 +73,7 @@ public class CurrencyProvider extends ContentProvider {
 
     private Cursor getCurrencyByCurrencyFromAndDate(Uri uri, String[] projection, String sortOrder) {
         String currencyFromSetting = CurrencyContract.CurrencyEntry.getFromCurrencyFromUri(uri);
-        String Date = CurrencyContract.CurrencyEntry.getStartDateFromUri(uri);
+        String Date = CurrencyContract.CurrencyEntry.getDateFromUri(uri);
         return sCurrencyByFromCurrencySettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                                projection,
                                sFromCurrencyAndDaySelection,

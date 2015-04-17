@@ -47,7 +47,7 @@ public class FetchCurrencyTask extends AsyncTask<String, Void, Void> {
 
 
     /**
-     * Take the String representing the complete forecast in JSON Format and
+     * Take the String representing the complete history in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
      */
     private void getCurrencyDataFromJson(String historyJsonStr, int numDays)
@@ -138,7 +138,7 @@ public class FetchCurrencyTask extends AsyncTask<String, Void, Void> {
             // Construct the URL for the  query
             //URL url = new URL("http://jsonrates.com/historical/?apiKey=jr-26819dd94d982b400989e59f7007119e&from=USD&to=TND&dateStart=2014-06-17&dateEnd=2014-06-23");
 
-            final String FORECAST_BASE_URL =
+            final String HISTORY_BASE_URL =
                     "http://jsonrates.com/historical/?";
             final String fromCurrency_PARAM = "from";
             final String toCurrency_PARAM = "to";
@@ -146,7 +146,7 @@ public class FetchCurrencyTask extends AsyncTask<String, Void, Void> {
             final String dateEnd_PARAM = "dateEnd";
             final String apiKey_PARAM = "apiKey";
 
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+            Uri builtUri = Uri.parse(HISTORY_BASE_URL).buildUpon()
                     .appendQueryParameter(fromCurrency_PARAM, params[0])
                     .appendQueryParameter(toCurrency_PARAM,toCurrency)
                             //   .appendQueryParameter(dateStart_PARAM, "2015-02-26")

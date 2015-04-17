@@ -27,6 +27,11 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
+
 import com.example.anisjr.currency.data.CurrencyContract;
 
 /**
@@ -85,7 +90,7 @@ public class SettingsActivity extends PreferenceActivity
                 String currencyFrom = value.toString();
                 currencyTask.execute(currencyFrom);
             } else {
-                // notify code that weather may be impacted
+                // notify code that currency may be impacted
                 getContentResolver().notifyChange(CurrencyContract.CurrencyEntry.CONTENT_URI, null);
             }
         }
@@ -104,5 +109,9 @@ public class SettingsActivity extends PreferenceActivity
         }
         return true;
     }
-
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+        @Override
+        public Intent getParentActivityIntent() {
+                return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            }
 }

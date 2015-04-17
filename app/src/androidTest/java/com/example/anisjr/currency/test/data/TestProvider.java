@@ -109,7 +109,7 @@ public class TestProvider extends AndroidTestCase {
         // vnd.android.cursor.dir/com.example.anisjr.currency/currency
 
         String testCurrencyFrom = "EUR";
-        // content://com.example.android.sunshine.app/currency/EUR
+        // content://com.example.anisjr.currency/currency/EUR
         type = mContext.getContentResolver().getType(
                 CurrencyEntry.buildCurrencyFrom(testCurrencyFrom));
         // vnd.android.cursor.dir/com.example.anisjr.currency/currency

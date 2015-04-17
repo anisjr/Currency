@@ -99,7 +99,8 @@ public class CurrencyContract {
                    }
 
         public static String getDateFromUri(Uri uri) {
-                        return uri.getPathSegments().get(2);
+
+            return uri.getPathSegments().get(2);
                     }
 
         public static String getStartDateFromUri(Uri uri) {
